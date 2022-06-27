@@ -39,7 +39,15 @@ export default new class StudentController {
                 message: 'Can not find student'
             })
         } else {
-            //Chưa xử lý được nó lỗi quá nhiều
+            var result = await Student.updateOne({
+                name: req.body.name,
+                address: req.body.address,
+                email: req.body.email,
+                phone: req.body.phone,
+                updatedAt: new Date()
+            })
+            console.log(result)
+            res.send("Update success")
         }
     }
 
