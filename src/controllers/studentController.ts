@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Student from "../models/Student";
+import Student from "../models/student";
 
 export default new class StudentController {
     getAll = async (req: Request, res: Response) => {

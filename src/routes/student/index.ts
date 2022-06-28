@@ -1,6 +1,6 @@
 import express from 'express'
 const route = express.Router()
-import studentController from '../../controllers/StudentController'
+import studentController from '../../controllers/studentController'
 
 route.get('/students/',studentController.getAll)
 route.post('/students/',studentController.add)
