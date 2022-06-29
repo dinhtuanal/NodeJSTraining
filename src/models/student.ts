@@ -26,4 +26,4 @@ const studentSchema = new Schema({
         default: Date.now,
     }
 });
-export default model('Student',studentSchema)
+export default mongoose.model('Student',studentSchema)

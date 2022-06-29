@@ -1,32 +1,32 @@
-import { Request, Response } from "express";
-import Category from "../models/category"
+import { Request, Response } from 'express'
+import Blog from '../models/blog'
 
-export default new class CategoryController{
+export default new class BlogController{
 
     add = async (req:Request, res:Response)=>{
-        await Category.create(req.body)
+        await Blog.create(req.body)
         res.status(200).json({
-            success:true,
+            success: true,
             message: "Add success"
         })
     }
 
-    getAll= async (req:Request, res:Response)=> {
-        const categories = await Category.find()
-        res.send(categories);
+    getAll = async (req:Request, res:Response)=>{
+        const blogs = await Blog.find();
+        res.status(200).send(blogs)
     }
 
     getById = async (req:Request, res:Response)=>{
-        const category = await Category.findById({_id: req.params.id})
-        if(!category){
+        const blog = await Blog.findById({_id: req.params.id})
+        if(!blog){
             res.status(400).json({
                 success: false,
-                message: "Can not find category",
+                message: "Can not find blog",
             })
         }else{
             res.status(200).json({
                 success: true,
-                data: category
+                data: blog
             })
         }
     }
@@ -35,12 +35,17 @@ export default new class CategoryController{
         if(!req.body._id){
             res.status(404).json({
                 success: false,
-                message: "Can not find category",
+                message: "Can not find blog",
             })
         }else{
-            await Category.updateOne({
-                name: req.body.name,
-                desc: req.body.desc
+            await Blog.updateOne({
+                title : req.body.title.image,
+                image : req.body.image,
+                summary : req.body.summary,
+                content : req.body.content,
+                categoryId : req.body.categoryId,
+                updatedAt : req.body.updatedAt,
+                createdBy : req.body.createdBy
             })
             res.status(200).json({
                 success: true,
@@ -51,9 +56,9 @@ export default new class CategoryController{
 
     delete = async (req:Request, res:Response)=>{
         if(!req.params.id){
-            res.status(404).end("Can not find category")
+            res.status(404).end("Can not find blog")
         }else{
-            var result = await Category.deleteOne({_id:req.params.id})
+            var result = await Blog.deleteOne({_id:req.params.id})
             if(!result){
                 res.status(400).json({
                     success: false,
@@ -67,5 +72,4 @@ export default new class CategoryController{
             }
         }
     }
-
 }

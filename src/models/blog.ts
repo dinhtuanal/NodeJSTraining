@@ -18,6 +18,9 @@ const blogSchema = new Schema({
     content: {
         type: String,
     },
+    categoryId: {
+        type: Schema.Types.ObjectId,
+    },
     createdAt:{
         type: Date,
         default: Date.now,
@@ -26,7 +29,7 @@ const blogSchema = new Schema({
         type: Date,
         default: Date.now,
     },
-    categoryId: {
+    createdBy: {
         type: Schema.Types.ObjectId,
     },
 })
