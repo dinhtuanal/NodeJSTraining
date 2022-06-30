@@ -1,10 +1,23 @@
 import { Request, Response } from 'express'
 import Blog from '../models/blog'
+import jwt from 'jsonwebtoken'
 
 export default new class BlogController{
 
+    getHeader = (req:Request, res:Response):string=>{
+        const token = ((res as any).req.headers.authorization as string).slice(7)
+        const decoded = jwt.verify(token, process.env.TOKEN_SECRET as string)
+        const userId = (decoded as any).userId as string
+        return userId
+    }
+    
     add = async (req:Request, res:Response)=>{
-        await Blog.create(req.body)
+
+        await Blog.create({
+            ...req.body,
+            createdBy: this.getHeader(req,res)
+        })
+        
         res.status(200).json({
             success: true,
             message: "Add success"

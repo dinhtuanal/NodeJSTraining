@@ -1,17 +1,15 @@
 import { Request, Response } from "express";
 import User from '../models/user'
 import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
 
 export default new class UserController{
     register = async (req:Request, res:Response)=>{
         const password = await bcrypt.hash(req.body.password, 10)
         try{
             const response = await User.create({
-                firstName: req.body.firstName,
-                lastName: req.body.lastName,
-                username: req.body.username,
-                password,
-                email: req.body.email,
+                ...req.body,
+                password
             })
             console.log(response)
             res.status(200).json({
@@ -40,19 +38,31 @@ export default new class UserController{
                 message: "Enter username and password !"
             })
         }
-
         const userLogin = await User.findOne({ username })
-        
         if(!userLogin){
             res.status(400).json({
                 message: "Username not exists !"
             })
         }else{
-            if(await bcrypt.compare(password, userLogin.password)){
-                res.json({message: "Login success"})
+            if(!await bcrypt.compare(password, userLogin.password)){
+                res.status(404).json({
+                    success: false,
+                    message: "Username or password incorrect"
+                })
             }
+            const token = jwt.sign(
+                { 
+                    userId: userLogin._id 
+                },
+                process.env.TOKEN_SECRET as string,
+                {
+                    expiresIn: '24h' 
+                });
+                res.status(200).json({
+                    userId: userLogin._id,
+                    token: token
+                });
         }
-        console.log(password)
     }
 
     getAll =async (req:Request, res:Response) => {
