@@ -13,12 +13,11 @@ export const getToken = async (req:Request, res:Response, next:NextFunction)=>{
                     message: "Not found"
                 })
             }else{
-                console.log("Tuan")
                 next()
             }
         })
     }catch(err:any){
-        console.log("Error")
+        console.log("Error: " , err)
         next(err)
     }
 }
