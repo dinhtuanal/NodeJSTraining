@@ -1,10 +1,16 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import User from '../models/user'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
-export default new class UserController{
+export default new class AuthController{
     register = async (req:Request, res:Response)=>{
+        if(req.body.password.length < 6 || req.body.password.length > 255){
+            res.json({
+                success: false,
+                message: "Password more than 6 charaters and less than 255 charaters!"
+            })
+        }
         const password = await bcrypt.hash(req.body.password, 10)
         try{
             const response = await User.create({
@@ -32,7 +38,6 @@ export default new class UserController{
 
     login = async (req:Request, res:Response) => {
         const { username, password} = req.body
-        
         if(!username || !password){
             res.status(400).json({
                 message: "Enter username and password !"
@@ -52,20 +57,17 @@ export default new class UserController{
             }
             const token = jwt.sign(
                 { 
-                    userId: userLogin._id 
+                    userId: userLogin._id,
                 },
                 process.env.TOKEN_SECRET as string,
                 {
                     expiresIn: '24h' 
-                });
-                res.status(200).json({
-                    userId: userLogin._id,
-                    token: token
-                });
+                }
+            );
+            res.status(200).json({
+                userId: userLogin._id,
+                token: token
+            });
         }
-    }
-
-    getAll =async (req:Request, res:Response) => {
-        
     }
 }

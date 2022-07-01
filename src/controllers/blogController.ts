@@ -11,15 +11,21 @@ export default new class BlogController{
     }
     
     add = async (req:Request, res:Response)=>{
-        await Blog.create({
-            ...req.body,
-            createdBy: this.getUserLogin(req,res)
-        })
-        
-        res.status(200).json({
-            success: true,
-            message: "Add success"
-        })
+        try{
+            await Blog.create({
+                ...req.body,
+                createdBy: this.getUserLogin(req,res)
+            })
+            
+            res.status(200).json({
+                success: true,
+                message: "Add success"
+            })
+        }catch(err){
+            res.json({
+                error: err
+            })
+        }
     }
 
     getAll = async (req:Request, res:Response)=>{
@@ -86,30 +92,30 @@ export default new class BlogController{
         try{
             if(!req.params.id){
                 res.status(404).end("Can not find blog")
+            }
+            const blog = await Blog.findOne({_id: req.params.id})
+            // console.log(blog)
+            if(String(blog?.createdBy) !== this.getUserLogin(req,res)){
+                // console.log(this.getUserLogin(req,res))
+                res.status(401).json({
+                    success: false,
+                    message: "Can not delete blog"
+                })
             }else{
-                const blog = await Blog.findOne({_id: req.params.id})
-                // console.log(blog)
-                if(String(blog?.createdBy) !== this.getUserLogin(req,res)){
-                    console.log(this.getUserLogin(req,res))
-                    res.status(401).json({
+                var result = await Blog.deleteOne({_id:req.params.id})
+                if(!result){
+                    res.status(400).json({
                         success: false,
-                        message: "Can not delete blog"
+                        message: "Can not delete"
                     })
                 }else{
-                    var result = await Blog.deleteOne({_id:req.params.id})
-                    if(!result){
-                        res.status(400).json({
-                            success: false,
-                            message: "Can not delete"
-                        })
-                    }else{
-                        res.status(200).json({
-                            success:true ,
-                            message: "Delete success"
-                        })
-                    }
+                    res.status(200).json({
+                        success:true ,
+                        message: "Delete success"
+                    })
                 }
             }
+            
         }catch(err){
             res.status(400).json({
                 error: err
